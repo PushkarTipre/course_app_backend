@@ -1,0 +1,8 @@
+<?php
+$imagePath = __DIR__ . '/uploads/default.png';
+if (file_exists($imagePath)) {
+    echo "Image exists at: $imagePath";
+} else {
+    echo "Image not found at: $imagePath";
+}
+?>

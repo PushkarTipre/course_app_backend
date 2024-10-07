@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Checkout</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <button id="rzp-button1">Pay Now</button>
+    <script>
+    // Parse the URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderData = JSON.parse(decodeURIComponent(urlParams.get('orderData')));
+
+    var options = {
+        "key": orderData.razorpay_key, 
+        "amount": orderData.amount,
+        "currency": orderData.currency,
+        "name": orderData.course_name,
+        "description": orderData.course_description,
+        "order_id": orderData.order_id,
+        "handler": function (response){
+            window.location.href = orderData.success_url + "?payment_id=" + response.razorpay_payment_id;
+        },
+        "prefill": {
+            "email": "customer@example.com"
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    document.getElementById('rzp-button1').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+    </script>
+</body>
+</html>
