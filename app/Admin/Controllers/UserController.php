@@ -10,7 +10,7 @@ use Encore\Admin\Show;
 
 class UserController extends AdminController
 {
-    protected $title ='Members';
+    protected $title = 'Members';
 
     protected function grid()
     {
@@ -20,7 +20,7 @@ class UserController extends AdminController
         $grid->column('name', __('Name'));
         $grid->column('email', __('Email'));
         // $grid->column('access_token', __('access_token'));
-     
+
         $grid->column('created_at', __('Created at'));
         // $grid->column('updated_at', __('Updated at'));
         $grid->disableActions();
@@ -38,7 +38,6 @@ class UserController extends AdminController
         $show->field('id', __('Id'));
         $show->field('name', __('Name'));
         $show->field('email', __('Email'));
-       
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
 
@@ -48,10 +47,9 @@ class UserController extends AdminController
     protected function form()
     {
         $form = new Form(new User());
-
         $form->textarea('name', __('Name'));
         $form->textarea('email', __('Email'));
-      
+
         return $form;
     }
 }

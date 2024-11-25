@@ -56,7 +56,7 @@ class LessonController extends Controller
             return response()->json(
                 [
                     'code' => 200,
-                    'msg' => 'My lesson detail is here',
+                    'msg' => 'My all lesson detail is here',
                     'data' => $result->video
                 ],
                 200

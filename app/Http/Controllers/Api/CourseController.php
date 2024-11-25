@@ -219,8 +219,14 @@ class CourseController extends Controller
     {
         $user = $request->user();
 
-        $result = Course::where('user_token', '=', $user->token)
-            ->select('name', 'thumbnail', 'lesson_num', 'price', 'id')->get();
+        $result = Course::whereIn('id', function ($query) use ($user) {
+            $query->select('course_id')
+                ->from('orders')
+                ->where('user_token', $user->token)
+                ->where('status', 1);  // Assuming status 1 means the order is completed
+        })
+            ->select('name', 'thumbnail', 'lesson_num', 'price', 'id')
+            ->get();
 
         return response()->json([
             'code' => 200,

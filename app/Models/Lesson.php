@@ -38,24 +38,47 @@ class Lesson extends Model
         $this->attributes['video'] = json_encode(array_values($value));
     }
 
+    // public function getVideoAttribute($value)
+    // {
+    //     $resvideo = json_decode($value, true) ?: [];
+    //     // if (!empty($resvideo)) {
+    //     //     foreach ($resvideo as $key => $value) {
+    //     //         $resvideo[$key]['url'] = env('APP_URL') . "uploads/" . $value['url'];
+    //     //         $resvideo[$key]['thumbnail'] = $value['thumbnail'];
+    //     //     }
+    //     // }
+    //     if (!empty($resvideo)) {
+    //         foreach ($resvideo as $key => $value) {
+    //             $resvideo[$key]['url'] = env("APP_URL") . "uploads/" . $value['url'];
+    //             $resvideo[$key]['thumbnail'] = env("APP_URL") . "uploads/" . $value['thumbnail'];
+    //         }
+    //     }
+    //     return $resvideo;
+
+    //     // $this->attributes['video'] = array_values(json_decode($value, true) ?: []);
+    // }
     public function getVideoAttribute($value)
     {
         $resvideo = json_decode($value, true) ?: [];
-        // if (!empty($resvideo)) {
-        //     foreach ($resvideo as $key => $value) {
-        //         $resvideo[$key]['url'] = env('APP_URL') . "uploads/" . $value['url'];
-        //         $resvideo[$key]['thumbnail'] = $value['thumbnail'];
-        //     }
-        // }
+
         if (!empty($resvideo)) {
             foreach ($resvideo as $key => $value) {
-                $resvideo[$key]['url'] = env("APP_URL") . "uploads/" . $value['url'];
-                $resvideo[$key]['thumbnail'] = env("APP_URL") . "uploads/" . $value['thumbnail'];
+                // Check if 'url' key exists
+                if (isset($value['url'])) {
+                    $resvideo[$key]['url'] = env("APP_URL") . "uploads/" . $value['url'];
+                } else {
+                    $resvideo[$key]['url'] = ''; // or whatever default value you want
+                }
+
+                // Check if 'thumbnail' key exists
+                if (isset($value['thumbnail'])) {
+                    $resvideo[$key]['thumbnail'] = env("APP_URL") . "uploads/" . $value['thumbnail'];
+                } else {
+                    $resvideo[$key]['thumbnail'] = ''; // or whatever default value you want
+                }
             }
         }
         return $resvideo;
-
-        // $this->attributes['video'] = array_values(json_decode($value, true) ?: []);
     }
     public function getThumbnailAttribute($value)
     {

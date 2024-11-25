@@ -19,7 +19,7 @@ Route::group(['namespace' => 'Api'], function () {
     /// Route::post('/login', [UserController::class, 'login']);
     Route::post('/login', 'UserController@login');
     Route::group(['middleware' => ['auth:sanctum']], function () {
-        // Route::any('courseList', [UserController::class, 'courseList']);
+
         Route::any('/courseList', 'CourseController@courseList');
         Route::any('/courseDetail', 'CourseController@courseDetail');
         Route::any('/coursesBought', 'CourseController@coursesBought');
@@ -30,6 +30,7 @@ Route::group(['namespace' => 'Api'], function () {
         Route::any('/coursesSearch', 'CourseController@coursesSearch');
         Route::any('/authorCourseList', 'CourseController@authorCourseList');
         Route::any('/courseAuthor', 'CourseController@courseAuthor');
+        Route::any('/user/update', 'UserController@updateUser');
     });
     Route::any('/webGoHooks', 'PaymentController@webGoHooks');
 });
