@@ -17,8 +17,10 @@ class UserController extends AdminController
         $grid = new Grid(new User());
 
         $grid->column('id', __('Id'));
+        $grid->column('unique_id', __('Unique ID'));
         $grid->column('name', __('Name'));
         $grid->column('email', __('Email'));
+
         // $grid->column('access_token', __('access_token'));
 
         $grid->column('created_at', __('Created at'));
@@ -36,6 +38,7 @@ class UserController extends AdminController
         $show = new Show(User::findOrFail($id));
 
         $show->field('id', __('Id'));
+        $show->field('unique_id', __('Unique ID'));
         $show->field('name', __('Name'));
         $show->field('email', __('Email'));
         $show->field('created_at', __('Created at'));

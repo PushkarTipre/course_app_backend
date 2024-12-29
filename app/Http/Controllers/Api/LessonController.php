@@ -41,132 +41,8 @@ class LessonController extends Controller
         }
     }
 
-    // protected function extractQuizData($file)
-    // {
-    //     // Implement your logic to extract quiz data from the file
-    //     $quizData = [
-    //         'quiz_name' => 'My Quiz',
-    //         'questions' => [
-    //             [
-    //                 'question' => 'What is the capital of France?',
-    //                 'answers' => ['Paris', 'London', 'Berlin', 'Madrid'],
-    //                 'correct_answer' => 0
-    //             ],
-    //             [
-    //                 'question' => 'What is the largest planet in our solar system?',
-    //                 'answers' => ['Earth', 'Mars', 'Jupiter', 'Saturn'],
-    //                 'correct_answer' => 2
-    //             ]
-    //         ]
-    //     ];
-
-    //     return json_encode($quizData);
-    // }
-
-    // public function lessonDetail(Request $request)
-    // {
-
-    //     $id = $request->id;
-
-    //     try {
-
-    //         $result =  Lesson::where('id', '=', $id)->select(
-    //             'name',
-    //             'description',
-    //             'thumbnail',
-    //             'video'
-    //         )->first();
-
-    //         $videoData = $result->video;
-
-    //         foreach ($videoData as &$video) { {
-    //                 $video['quiz_json'] = $this->extractQuizData($video['quiz']);
-    //             }
-    //         }
 
 
-
-    //         return response()->json(
-    //             [
-    //                 'code' => 200,
-    //                 'msg' => 'My all lesson detail is here',
-    //                 'data' => $result->video
-    //             ],
-    //             200
-    //         );
-    //     } catch (\Throwable $e) {
-    //         return response()->json(
-    //             [
-    //                 'code' => 500,
-    //                 'msg' => 'Server internal error',
-    //                 'data' => $e->getMessage()
-    //             ],
-    //             500
-    //         );
-    //     }
-    // }
-
-    // public function lessonDetail(Request $request)
-    // {
-    //     $id = $request->id;
-
-    //     try {
-    //         // Fetch the lesson by ID
-    //         $result = Lesson::where('id', '=', $id)->select(
-    //             'name',
-    //             'description',
-    //             'thumbnail',
-    //             'video'
-    //         )->first();
-
-    //         if (!$result) {
-    //             return response()->json([
-    //                 'code' => 404,
-    //                 'msg' => 'Lesson not found',
-    //                 'data' => null,
-    //             ], 404);
-    //         }
-
-    //         $videoData = $result->video;
-
-    //         // Add demo quiz_json data for each video
-    //         foreach ($videoData as &$video) {
-    //             $video['quiz_json'] = json_encode([
-    //                 'quiz_name' => 'Demo Quiz',
-    //                 'questions' => [
-    //                     [
-    //                         'question' => 'What is 2 + 2?',
-    //                         'answers' => ['3', '4', '5', '6'],
-    //                         'correct_answer' => 1 // Index of the correct answer (4)
-    //                     ],
-    //                     [
-    //                         'question' => 'What color is the sky?',
-    //                         'answers' => ['Blue', 'Red', 'Green', 'Yellow'],
-    //                         'correct_answer' => 0 // Index of the correct answer (Blue)
-    //                     ]
-    //                 ]
-    //             ]);
-    //         }
-
-    //         return response()->json(
-    //             [
-    //                 'code' => 200,
-    //                 'msg' => 'My all lesson detail is here',
-    //                 'data' => $videoData, // Return video data with demo quiz_json
-    //             ],
-    //             200
-    //         );
-    //     } catch (\Throwable $e) {
-    //         return response()->json(
-    //             [
-    //                 'code' => 500,
-    //                 'msg' => 'Server internal error',
-    //                 'data' => $e->getMessage(),
-    //             ],
-    //             500
-    //         );
-    //     }
-    // }
     protected function extractQuizData($file)
     {
         // Correct the path by omitting the "public/" part
@@ -210,7 +86,6 @@ class LessonController extends Controller
             ];
         }
     }
-
     protected function parseQuizContent($text)
     {
         // Initialize the array to store the parsed questions
@@ -224,8 +99,10 @@ class LessonController extends Controller
 
         // Iterate through each line and process it
         foreach ($lines as $line) {
+            $line = trim($line); // Trim whitespace from the line
+
             // Check if the line contains a question
-            if (preg_match('/^Question \d+/', $line)) {
+            if (preg_match('/^Question \d+:\s*(.*)/', $line, $matches)) {
                 // If there is a previous question, push it to the result
                 if ($currentQuestion !== null) {
                     $quizArray[] = [
@@ -235,23 +112,20 @@ class LessonController extends Controller
                     ];
                 }
 
-                // Start a new question
-                $currentQuestion = trim(str_replace('Question', '', $line));
+                // Start a new question and capture only the text after the colon
+                $currentQuestion = $matches[1]; // Capture the question text
                 $currentAnswers = [];
                 $correctAnswer = null;
             }
 
             // Check if the line contains an option
-            if (preg_match('/^Option \d+/', $line)) {
-                $option = trim(str_replace('Option', '', $line));
-                $currentAnswers[] = $option;
+            elseif (preg_match('/^Option \d+:\s*(.*)/', $line, $matches)) {
+                $currentAnswers[] = $matches[1]; // Capture the option text
             }
 
             // Check if the line contains the correct answer
-            if (preg_match('/^Answer :/', $line)) {
-                // Get the answer number (e.g., Option 3)
-                preg_match('/Option (\d+)/', $line, $matches);
-                $correctAnswer = isset($matches[1]) ? (int)$matches[1] - 1 : null; // Zero-based index
+            elseif (preg_match('/^Answer\s*:\s*Option\s*(\d+)/', $line, $matches)) {
+                $correctAnswer = (int)$matches[1] - 1; // Convert to zero-based index
             }
         }
 

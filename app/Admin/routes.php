@@ -4,6 +4,7 @@ use App\Admin\Controllers\CourseController;
 use App\Admin\Controllers\CourseTypeController;
 use App\Admin\Controllers\UserController;
 use App\Admin\Controllers\LessonController;
+use App\Admin\Controllers\QuizAttemptController;
 use Illuminate\Routing\Router;
 
 Admin::routes();
@@ -20,4 +21,5 @@ Route::group([
     $router->resource('/course-types', CourseTypeController::class);
     $router->resource('/courses', CourseController::class);
     $router->resource('/lessons', LessonController::class);
+    $router->resource('/quiz', QuizAttemptController::class);
 });

@@ -11,566 +11,11 @@ use Encore\Admin\Show;
 
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Facades\Admin;
-
+use Illuminate\Support\Facades\Log;
 use Smalot\PdfParser\Parser;
 use PhpOffice\PhpWord\IOFactory;
 use setasign\Fpdi\Fpdi;
 
-// class LessonController extends AdminController
-// {
-//     /**
-//      * Title for current resource.
-//      *
-//      * @var string
-//      */
-//     protected $title = 'Lesson';
-
-//     /**
-//      * Make a grid builder.
-//      *
-//      * @return Grid
-//      */
-//     protected function grid()
-//     {
-//         $grid = new Grid(new Lesson());
-
-//         if (Admin::user()->isRole('teacher')) {
-//             $token = Admin::user()->token;
-//             $ids = DB::table('courses')->where('user_token', '=', $token)->pluck('id')->toArray();
-
-//             $grid->model()->whereIn('course_id', $ids);
-//         }
-
-//         $grid->column('id', __('Id'));
-//         $grid->column('course_id', __('Course'))->display(function ($id) {
-//             $item = Course::where('id', '=', $id)->value('name');
-//             return $item;
-//         });
-//         $grid->column('name', __('Name'));
-//         $grid->column('thumbnail', __('Thumbnail'))->image('', 50, 50);
-//         $grid->column('description', __('Description'));
-//         // $grid->column('video', __('Video'));
-//         $grid->column('created_at', __('Created at'));
-//         $grid->column('updated_at', __('Updated at'));
-
-//         return $grid;
-//     }
-
-//     /**
-//      * Make a show builder.
-//      *
-//      * @param mixed $id
-//      * @return Show
-//      */
-//     protected function detail($id)
-//     {
-//         $show = new Show(Lesson::findOrFail($id));
-
-//         $show->field('id', __('Id'));
-//         $show->field('course_id', __('Course id'));
-//         $show->field('name', __('Name'));
-//         $show->field('thumbnail', __('Thumbnail'));
-//         $show->field('description', __('Description'));
-//         $show->field('video', __('Video'));
-//         $show->field('created_at', __('Created at'));
-//         $show->field('updated_at', __('Updated at'));
-
-//         return $show;
-//     }
-
-//     /**
-//      * Make a form builder.
-//      *
-//      * @return Form
-//      */
-//     protected function form()
-//     {
-//         $form = new Form(new Lesson());
-
-
-//         if (Admin::user()->isRole('teacher')) {
-//             $token = Admin::user()->token;
-//             $id = DB::table('courses')->where('user_token', '=', $token)->pluck("names", "id");
-//             $form->select('course_id', __('Courses'))->options($id);
-//         } else {
-//             $result = DB::table('courses')->pluck('name', 'id');
-//             $form->select('course_id', __('Courses'))->options($result);
-//         }
-
-//         //$form->number('course_id', __('Course id'));
-
-//         // $result = Course::pluck('name', 'id');
-//         // $form->select('course_id', __('Courses'))->options($result);
-//         $form->text('name', __('Name'));
-//         $form->image('thumbnail', __('Thumbnail'))->uniqueName();
-//         $form->text('description', __('Description'));
-
-//         if ($form->isEditing()) {
-
-//             $form->table('video', function ($form) {
-//                 $form->text('name')->rules('required');
-//                 $form->image('thumbnail')->uniqueName()->rules('required');
-//                 $form->file('url')->rules('required');
-
-//                 $form->hidden('old_thumbnail');
-//                 $form->hidden('old_url');
-//             });
-//         } else {
-//             $form->table('video', function ($form) {
-//                 $form->text('name')->rules('required');
-//                 $form->image('thumbnail')->uniqueName()->rules('required');
-//                 $form->file('url')->rules('required');
-//             });
-//         }
-
-
-//         $form->display('created_at', __('Created at'));
-//         $form->display('updated_at', __('Updated at'));
-
-//         $form->saving(function (Form $form) {
-
-//             if ($form->isEditing()) {
-//                 $video = $form->video;
-//                 $result = $form->model()->video;
-//                 $newVideos = [];
-//                 $path = env("APP_URL") . "uploads/";
-//                 foreach ($video as $k => $v) {
-//                     $videoVal = [];
-//                     if (empty($v["url"])) {
-//                         $videoVal["old_url"] = str_replace($path, "", $result[$k]["url"]);
-//                     } else {
-//                         $videoVal["url"] = $v["url"];
-//                     }
-
-
-//                     if (empty($v["name"])) {
-//                         $videoVal["name"] = str_replace($path, "", $result[$k]["name"]);
-//                     } else {
-//                         $videoVal["name"] = $v["name"];
-//                     }
-
-//                     array_push($newVideos, $videoVal);
-//                 }
-
-//                 $form->video = $newVideos;
-//             }
-//         });
-
-//         return $form;
-//     }
-// }
-
-//FINAL CODE
-// class LessonController extends AdminController
-// {
-//     /**
-//      * Title for current resource.
-//      *
-//      * @var string
-//      */
-//     protected $title = 'Lesson';
-
-//     /**
-//      * Make a grid builder.
-//      *
-//      * @return Grid
-//      */
-//     protected function grid()
-//     {
-//         $grid = new Grid(new Lesson());
-
-//         if (Admin::user()->isRole('teacher')) {
-//             $token = Admin::user()->token;
-//             $ids = DB::table("courses")->where("user_token", "=", $token)->pluck("id")->toArray();
-
-//             $grid->model()->whereIn('course_id', $ids);
-//         }
-
-//         $grid->model()->orderBy('id', 'desc');
-
-//         $grid->column('id', __('Id'));
-
-//         $grid->column('course_id', __('Course'))->display(function ($item) {
-
-//             $item = DB::table("courses")->where("id", "=", $item)->value("name");
-//             return $item;
-//         });
-//         $grid->column('name', __('Name'));
-//         $grid->column('thumbnail', __('Thumbnail'))->image('', 50, 50);
-//         // $grid->column('video', __('Video'));
-//         $grid->column('description', __('Description'));
-
-//         $grid->column('created_at', __('Created_at'));
-
-//         $grid->disableExport();
-//         $grid->disableFilter();
-//         $grid->actions(function ($actions) {
-//             // 去掉查看
-//             $actions->disableView();
-//         });
-
-//         return $grid;
-//     }
-
-//     /**
-//      * Make a show builder.
-//      *
-//      * @param mixed $id
-//      * @return Show
-//      */
-//     protected function detail($id) {}
-
-//     /**
-//      * Make a form builder.
-//      *
-//      * @return Form
-//      */
-//     protected function form()
-//     {
-//         $form = new Form(new Lesson());
-
-//         $form->display('id', __('ID'));
-//         $form->text('name', __('Name'));
-
-
-//         if (Admin::user()->isRole('teacher')) {
-//             $token = Admin::user()->token;
-//             $res = DB::table("courses")->where("user_token", "=", $token)->pluck('name', 'id');
-//             $form->select('course_id', __('Courses'))->options($res);
-//         } else {
-
-//             $res = DB::table("courses")->pluck('name', 'id');
-//             $form->select('course_id', __('Courses'))->options($res);
-//         }
-
-
-//         $form->image('thumbnail', __('Thumbnail'))->uniqueName();
-//         $form->text('description', __('Description'));
-//         if ($form->isEditing()) {
-//             $form->table('video', function ($table) {
-
-//                 $table->text('name');
-//                 $table->hidden('old_thumbnail');
-//                 $table->hidden('old_url');
-//                 $table->image('thumbnail')->uniqueName();
-//                 $table->file('url');
-//             });
-//         } else {
-//             $form->table('video', function ($table) {
-
-//                 $table->text('name')->required();
-//                 $table->image('thumbnail')->uniqueName()->required();
-//                 $table->file('url')->required();
-//             });
-//         }
-
-//         $form->display('created_at', __('Created At'));
-//         $form->display('updated_at', __('Updated At'));
-//         //during processing after submit
-//         $form->saving(function (Form $form) {
-
-//             //  dump($form->video);
-//             if ($form->isEditing()) {
-
-//                 $video = $form->video;
-//                 //previous values //values in the Form container
-//                 $res = $form->model()->video;
-//                 $newVideo = [];
-//                 $path = env("APP_URL") . "uploads/";
-//                 foreach ($video as $k => $v) {
-//                     $valueVideo = [];
-
-//                     //if not editing
-//                     if (empty($v["url"])) {
-//                         //because of getVideoAttribue we get domain url
-//                         $valueVideo["old_url"] = empty($res[$k]["url"]) ? "" : str_replace($path, "", $res[$k]["url"]);
-//                     } else {
-//                         $valueVideo["url"] = $v["url"];
-//                     }
-//                     if (empty($v["thumbnail"])) {
-//                         $valueVideo["old_thumbnail"] = empty($res[$k]["thumbnail"]) ? "" : str_replace($path, "", $res[$k]["thumbnail"]);
-//                     } else {
-//                         $valueVideo["thumbnail"] = $v["thumbnail"];
-//                     }
-//                     if (empty($v["name"])) {
-//                         $valueVideo["name"] = empty($res[$k]["name"]) ? "" : $res[$k]["name"];
-//                     } else {
-//                         $valueVideo["name"] = $v["name"];
-//                     }
-//                     $valueVideo["_remove_"] = $v["_remove_"];
-//                     array_push($newVideo, $valueVideo);
-//                 }
-//                 // dump($form->video);
-//                 //  dump($newVideo);
-//                 $form->video = $newVideo;
-//             }
-//         });
-
-
-//         return $form;
-//     }
-// }
-
-//USE THIS CODE
-// class LessonController extends AdminController
-// {
-//     protected $title = 'Lesson';
-
-//     protected function grid()
-//     {
-//         $grid = new Grid(new Lesson());
-
-//         if (Admin::user()->isRole('teacher')) {
-//             $token = Admin::user()->token;
-//             $ids = DB::table("courses")->where("user_token", "=", $token)->pluck("id")->toArray();
-
-//             $grid->model()->whereIn('course_id', $ids);
-//         }
-
-//         $grid->model()->orderBy('id', 'desc');
-
-//         $grid->column('id', __('Id'));
-//         // $grid->column('lesson_id', __('Lesson ID'));
-//         $grid->column('course_id', __('Course'))->display(function ($item) {
-//             $item = DB::table("courses")->where("id", "=", $item)->value("name");
-//             return $item;
-//         });
-//         $grid->column('name', __('Name'));
-//         $grid->column('thumbnail', __('Thumbnail'))->image('', 50, 50);
-//         $grid->column('description', __('Description'));
-//         $grid->column('created_at', __('Created_at'));
-
-//         $grid->disableExport();
-//         $grid->disableFilter();
-//         $grid->actions(function ($actions) {
-//             $actions->disableView();
-//         });
-
-//         return $grid;
-//     }
-
-//     protected function detail($id) {}
-
-//     protected function form()
-//     {
-//         $form = new Form(new Lesson());
-
-//         $form->display('id', __('ID'));
-//         // $form->display('lesson_id', __('Lesson ID'))->with(function ($value) {
-//         //     return $value ?: 'Will be automatically generated';
-//         // });
-//         $form->text('name', __('Name'));
-
-//         if (Admin::user()->isRole('teacher')) {
-//             $token = Admin::user()->token;
-//             $res = DB::table("courses")->where("user_token", "=", $token)->pluck('name', 'id');
-//             $form->select('course_id', __('Courses'))->options($res);
-//         } else {
-//             $res = DB::table("courses")->pluck('name', 'id');
-//             $form->select('course_id', __('Courses'))->options($res);
-//         }
-
-//         $form->image('thumbnail', __('Thumbnail'))->uniqueName();
-//         $form->text('description', __('Description'));
-
-//         if ($form->isEditing()) {
-//             $form->table('video', function ($table) {
-//                 $table->text('name');
-//                 $table->hidden('old_thumbnail');
-//                 $table->hidden('old_url');
-//                 $table->image('thumbnail')->uniqueName();
-//                 $table->file('url');
-//             });
-//         } else {
-//             $form->table('video', function ($table) {
-//                 $table->text('name')->required();
-//                 $table->image('thumbnail')->uniqueName()->required();
-//                 $table->file('url')->required();
-//             });
-//         }
-
-//         $form->display('created_at', __('Created At'));
-//         $form->display('updated_at', __('Updated At'));
-
-//         $form->saving(function (Form $form) {
-//             // if ($form->isCreating()) {
-//             //     // Generate the next lesson_id
-//             //     $maxLessonId = Lesson::max('lesson_id') ?? 0;
-//             //     $form->lesson_id = $maxLessonId + 1;
-//             // }
-
-//             if ($form->isEditing()) {
-//                 $video = $form->video;
-//                 $res = $form->model()->video;
-//                 $newVideo = [];
-//                 $path = env("APP_URL") . "uploads/";
-//                 foreach ($video as $k => $v) {
-//                     $valueVideo = [];
-//                     if (empty($v["url"])) {
-//                         $valueVideo["old_url"] = empty($res[$k]["url"]) ? "" : str_replace($path, "", $res[$k]["url"]);
-//                     } else {
-//                         $valueVideo["url"] = $v["url"];
-//                     }
-//                     if (empty($v["thumbnail"])) {
-//                         $valueVideo["old_thumbnail"] = empty($res[$k]["thumbnail"]) ? "" : str_replace($path, "", $res[$k]["thumbnail"]);
-//                     } else {
-//                         $valueVideo["thumbnail"] = $v["thumbnail"];
-//                     }
-//                     if (empty($v["name"])) {
-//                         $valueVideo["name"] = empty($res[$k]["name"]) ? "" : $res[$k]["name"];
-//                     } else {
-//                         $valueVideo["name"] = $v["name"];
-//                     }
-//                     $valueVideo["_remove_"] = $v["_remove_"];
-//                     array_push($newVideo, $valueVideo);
-//                 }
-//                 $form->video = $newVideo;
-//             }
-//         });
-
-//         return $form;
-//     }
-// }
-
-
-
-
-//FINAL CODE - 24 NOV 2024
-// class LessonController extends AdminController
-// {
-//     protected $title = 'Lesson';
-
-//     protected function grid()
-//     {
-//         $grid = new Grid(new Lesson());
-
-//         if (Admin::user()->isRole('teacher')) {
-//             $token = Admin::user()->token;
-//             $ids = DB::table("courses")->where("user_token", "=", $token)->pluck("id")->toArray();
-
-//             $grid->model()->whereIn('course_id', $ids);
-//         }
-
-//         $grid->model()->orderBy('id', 'desc');
-
-//         $grid->column('id', __('Id'));
-//         $grid->column('course_id', __('Course'))->display(function ($item) {
-//             $item = DB::table("courses")->where("id", "=", $item)->value("name");
-//             return $item;
-//         });
-//         $grid->column('name', __('Name'));
-//         $grid->column('thumbnail', __('Thumbnail'))->image('', 50, 50);
-//         $grid->column('description', __('Description'));
-//         $grid->column('created_at', __('Created_at'));
-
-//         $grid->disableExport();
-//         $grid->disableFilter();
-//         $grid->actions(function ($actions) {
-//             $actions->disableView();
-//         });
-
-//         return $grid;
-//     }
-
-//     protected function detail($id) {}
-
-//     protected function form()
-//     {
-
-
-//         $form = new Form(new Lesson());
-//         $form->tools(function (Form\Tools $tools) {
-//             // Add a cancel button that returns to the list view
-//             $tools->append('<a href="' . admin_url('lessons') . '" class="btn btn-sm btn-danger mr-1" style="margin-right: 5px;"><i class="fa fa-times"></i>&nbsp;Cancel</a>');
-//         });
-//         $form->tools(function (Form\Tools $tools) {
-
-//             $tools->disableView();    // Optional: if you want to disable view
-//             $tools->disableList();    // Optional: if you want to disable list
-//         });
-//         $form->display('id', __('ID'));
-//         $form->text('name', __('Name'));
-
-//         if (Admin::user()->isRole('teacher')) {
-//             $token = Admin::user()->token;
-//             $res = DB::table("courses")->where("user_token", "=", $token)->pluck('name', 'id');
-//             $form->select('course_id', __('Courses'))->options($res);
-//         } else {
-//             $res = DB::table("courses")->pluck('name', 'id');
-//             $form->select('course_id', __('Courses'))->options($res);
-//         }
-
-//         $form->image('thumbnail', __('Thumbnail'))->uniqueName();
-//         $form->text('description', __('Description'));
-
-//         if ($form->isEditing()) {
-//             $form->table('video', function ($table) {
-//                 $table->text('name');
-//                 $table->hidden('old_thumbnail');
-//                 $table->hidden('old_url');
-//                 $table->hidden('old_course_video_id');  // Add this line
-//                 $table->image('thumbnail')->uniqueName();
-//                 $table->file('quiz');
-//                 $table->file('url');
-
-//                 $table->text('course_video_id');
-//             });
-//         } else {
-//             $form->table('video', function ($table) {
-//                 $table->text('name')->required();
-//                 $table->image('thumbnail')->uniqueName()->required();
-//                 $table->file('url')->required();
-//                 $table->file('quiz');
-//                 $table->text('course_video_id')->required();
-//             });
-//         }
-
-//         $form->display('created_at', __('Created At'));
-//         $form->display('updated_at', __('Updated At'));
-
-//         $form->saving(function (Form $form) {
-//             if ($form->isEditing()) {
-//                 $video = $form->video;
-//                 $res = $form->model()->video;
-//                 $newVideo = [];
-//                 $path = env("APP_URL") . "uploads/";
-//                 foreach ($video as $k => $v) {
-//                     $valueVideo = [];
-//                     if (empty($v["url"])) {
-//                         $valueVideo["old_url"] = empty($res[$k]["url"]) ? "" : str_replace($path, "", $res[$k]["url"]);
-//                     } else {
-//                         $valueVideo["url"] = $v["url"];
-//                     }
-//                     if (empty($v["quiz"])) {
-//                         $valueVideo["old_quiz"] = empty($res[$k]["quiz"]) ? "" : str_replace($path, "", $res[$k]["quiz"]);
-//                     } else {
-//                         $valueVideo["quiz"] = $v["quiz"];
-//                     }
-//                     if (empty($v["thumbnail"])) {
-//                         $valueVideo["old_thumbnail"] = empty($res[$k]["thumbnail"]) ? "" : str_replace($path, "", $res[$k]["thumbnail"]);
-//                     } else {
-//                         $valueVideo["thumbnail"] = $v["thumbnail"];
-//                     }
-//                     if (empty($v["name"])) {
-//                         $valueVideo["name"] = empty($res[$k]["name"]) ? "" : $res[$k]["name"];
-//                     } else {
-//                         $valueVideo["name"] = $v["name"];
-//                     }
-//                     if (empty($v["course_video_id"])) {
-//                         $valueVideo["old_course_video_id"] = empty($res[$k]["course_video_id"]) ? "" : $res[$k]["course_video_id"];
-//                     } else {
-//                         $valueVideo["course_video_id"] = $v["course_video_id"];
-//                     }
-//                     $valueVideo["_remove_"] = $v["_remove_"];
-//                     array_push($newVideo, $valueVideo);
-//                 }
-//                 $form->video = $newVideo;
-//             }
-//         });
-
-//         return $form;
-//     }
-// }
 
 
 
@@ -612,12 +57,7 @@ class LessonController extends AdminController
 
     protected function detail($id) {}
 
-    // function extractQuizData($file)
-    // {
-    //     $content = $this->getTextFromFile($file);
-    //     $quizData = $this->parseQuizContent($content);
-    //     return $quizData;
-    // }
+
 
     protected function getTextFromFile($file)
     {
@@ -645,45 +85,7 @@ class LessonController extends AdminController
         return $content;
     }
 
-    // protected function getPageContent($pdfPath, $pageNumber)
-    // {
-    //     $pdf = new Fpdi();
-    //     $pdf->setSourceFile($pdfPath);
-    //     $pageCount = $pdf->setSourceFile($pdfPath);
 
-    //     if ($pageNumber > $pageCount) {
-    //         return '';
-    //     }
-
-    //     $pdf->AddPage();
-    //     $tplIdx = $pdf->importPage($pageNumber);
-    //     $pdf->useTemplate($tplIdx, 0, 0, 0, 0, true);
-    //     $content = $pdf->GetPageContent($pageNumber);
-
-    //     return $content;
-    // }
-
-    // protected function parseQuizContent($content)
-    // {
-    //     // Use regular expressions or NLP techniques to identify questions, answers, and correct answers
-    //     // Return the data in the desired JSON format
-    //     $quizData = [
-    //         'quiz_name' => 'My Quiz',
-    //         'questions' => [
-    //             [
-    //                 'question' => 'What is the capital of France?',
-    //                 'answers' => ['Paris', 'London', 'Berlin', 'Madrid'],
-    //                 'correct_answer' => 0
-    //             ],
-    //             [
-    //                 'question' => 'What is the largest planet in our solar system?',
-    //                 'answers' => ['Earth', 'Mars', 'Jupiter', 'Saturn'],
-    //                 'correct_answer' => 2
-    //             ]
-    //         ]
-    //     ];
-    //     return $quizData;
-    // }
 
     protected function form()
     {
@@ -694,6 +96,31 @@ class LessonController extends AdminController
             // Add a cancel button that returns to the list view
             $tools->append('<a href="' . admin_url('lessons') . '" class="btn btn-sm btn-danger mr-1" style="margin-right: 5px;"><i class="fa fa-times"></i>&nbsp;Cancel</a>');
         });
+        if ($form->isEditing()) {
+            $form->html('
+            <div style="text-align: center; font-size: 18px; font-weight: bold; color: #d9534f; margin-bottom: 15px; background-color: #f8d7da; padding: 10px; border-radius: 5px; border: 1px solid #f5c6cb;">
+                <i class="fa fa-exclamation-triangle" style="margin-right: 10px;"></i> 
+                <span>Warning: Important Notice</span>
+            </div>
+            <div style="text-align: center; font-size: 16px; color: #721c24; margin-bottom: 20px;">
+                <strong>If you make any minor changes to the following data, you need to REUPLOAD:</strong>
+            </div>
+            <div style="text-align: center; font-size: 16px; color: #383d41; margin-bottom: 20px;">
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li><strong>1) Video</strong> - Please upload the same or updated video again.</li>
+                    <li><strong>2) Video Thumbnail</strong> - Please upload the same or updated video thumbnail again.</li>
+                    <li><strong>3) Quiz</strong> - Please upload quiz file. Leave it empty if there is no quiz for a particular video.</li>
+                </ul>
+            </div>
+            <div style="text-align: center; font-size: 14px; color: #c82333; font-weight: bold;">
+                <span>If you save you will lose all the videos, thumbnails and quizes. Before saving please validate the changes.</span>
+            <div style="text-align: center; font-size: 14px; color: #c82333; font-weight: bold;">
+                <span>If you want to cancel these changes, click the Cancel button below to prevent any loss of data.</span>
+            </div>
+        ');
+        }
+
+
         $form->tools(function (Form\Tools $tools) {
 
             $tools->disableView();    // Optional: if you want to disable view
@@ -702,9 +129,13 @@ class LessonController extends AdminController
         $form->display('id', __('ID'));
         $form->text('name', __('Name'));
 
-        $form->hidden('quiz_file', __('Quiz File'));
+        // $form->hidden('quiz', __('Quiz File'));
 
         $form->saving(function (Form $form) {
+            Log::info('Form saving started', [
+                'is_editing' => $form->isEditing(),
+                'form_id' => $form->model()->id ?? 'new'
+            ]);
             if ($form->quiz_file) {
                 $quizContent = $this->extractQuizData($form->quiz_file);
                 $form->quiz_json = json_encode($quizContent);
@@ -754,7 +185,9 @@ class LessonController extends AdminController
                 $res = $form->model()->video;
                 $newVideo = [];
                 $path = env("APP_URL") . "uploads/";
+                // Log::info($video);
                 foreach ($video as $k => $v) {
+
                     $valueVideo = [];
                     if (empty($v["url"])) {
                         $valueVideo["old_url"] = empty($res[$k]["url"]) ? "" : str_replace($path, "", $res[$k]["url"]);
@@ -785,8 +218,70 @@ class LessonController extends AdminController
                     array_push($newVideo, $valueVideo);
                 }
                 $form->video = $newVideo;
+            } else {
+                if (isset($form->video)) {
+                    Log::info('Processing new lesson videos', [
+                        'total_videos' => count($form->video)
+                    ]);
+                    Log::info('PHP Upload Settings', [
+                        'upload_max_filesize' => ini_get('upload_max_filesize'),
+                        'post_max_size' => ini_get('post_max_size'),
+                        'max_file_uploads' => ini_get('max_file_uploads'),
+                        'memory_limit' => ini_get('memory_limit'),
+                    ]);
+                    foreach ($form->video as $k => $v) {
+                        Log::info("Processing new video #{$k}", [
+                            'has_required_fields' => [
+                                'name' => !empty($v['name']),
+                                'thumbnail' => !empty($v['thumbnail']),
+                                'url' => !empty($v['url']),
+                                'course_video_id' => !empty($v['course_video_id'])
+                            ]
+                        ]);
+                    }
+                    if (count($form->video) > ini_get('max_file_uploads')) {
+                        Log::warning('Exceeding max_file_uploads limit', [
+                            'attempted' => count($form->video),
+                            'max_allowed' => ini_get('max_file_uploads')
+                        ]);
+                    }
+                }
             }
         });
+
+        Admin::script(<<<JS
+            $(document).ready(function() {
+               
+                $('.btn-primary[type="submit"]').click(function(e) {
+                    if ($('input[name$="[thumbnail]"]').val() === '' && 
+                        $('input[name$="[quiz]"]').val() === '' && 
+                        $('input[name$="[url]"]').val() === '') {
+                        
+                        e.preventDefault();
+                        
+                        Swal.fire({
+                            title: 'Warning!',
+                            text: 'You need to re-upload thumbnail, quiz, and video files before saving. Would you like to continue?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, save anyway',
+                            cancelButtonText: 'No, let me upload files'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                
+                                $(e.target).closest('form').submit();
+                            }
+                        });
+                        
+                        return false;
+                    }
+                });
+            });
+        JS);
+
+
 
         return $form;
     }

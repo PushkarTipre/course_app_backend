@@ -52,6 +52,7 @@ class UserController extends Controller
             if (empty($user->id)) {
                 $validated["token"] = md5(uniqid() . rand(10000, 99999));
                 $validated['created_at'] = Carbon::now();
+                $validated['unique_id'] = uniqid(); // Add unique_id to the user's data
                 //$validated['password']= Hash::make($validated['password']);
                 $userID = USer::insertGetId($validated);
                 $userInfo = User::where('id', '=', $userID)->first();
@@ -135,49 +136,4 @@ class UserController extends Controller
             ], 500);
         }
     }
-
-    // /**
-    //  * Login The User
-    //  * @param Request $request
-    //  * @return User
-    //  */
-    // public function loginUser(Request $request)
-    // {
-    //     try {
-    //         $validateUser = Validator::make($request->all(), 
-    //         [
-    //             'email' => 'required|email',
-    //             'password' => 'required'
-    //         ]);
-
-    //         if($validateUser->fails()){
-    //             return response()->json([
-    //                 'status' => false,
-    //                 'message' => 'validation error',
-    //                 'errors' => $validateUser->errors()
-    //             ], 401);
-    //         }
-
-    //         if(!Auth::attempt($request->only(['email', 'password']))){
-    //             return response()->json([
-    //                 'status' => false,
-    //                 'message' => 'Email & Password does not match with our record.',
-    //             ], 401);
-    //         }
-
-    //         $user = User::where('email', $request->email)->first();
-
-    //         return response()->json([
-    //             'status' => true,
-    //             'message' => 'User Logged In Successfully',
-    //             'token' => $user->createToken("API TOKEN")->plainTextToken
-    //         ], 200);
-
-    //     } catch (\Throwable $th) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => $th->getMessage()
-    //         ], 500);
-    //     }
-    // }
 }
