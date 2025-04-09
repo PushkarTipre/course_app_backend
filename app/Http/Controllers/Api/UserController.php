@@ -52,7 +52,7 @@ class UserController extends Controller
             if (empty($user->id)) {
                 $validated["token"] = md5(uniqid() . rand(10000, 99999));
                 $validated['created_at'] = Carbon::now();
-                $validated['unique_id'] = uniqid(); // Add unique_id to the user's data
+                $validated['unique_id'] = uniqid();
                 //$validated['password']= Hash::make($validated['password']);
                 $userID = USer::insertGetId($validated);
                 $userInfo = User::where('id', '=', $userID)->first();
@@ -74,59 +74,6 @@ class UserController extends Controller
             return response()->json([
                 'code' => 200,
                 'msg' => 'User Logged In Successfully',
-                'data' => $user
-            ], 200);
-
-
-            // $user = User::create([
-            //     'name' => $request->name,
-            //     'email' => $request->email,
-            //     'password' => Hash::make($request->password)
-            // ]);
-
-
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
-        }
-    }
-
-    public function updateUser(Request $request)
-    {
-        try {
-            // Validate the request
-            $validateUser = Validator::make($request->all(), [
-                'username' => 'nullable|string|max:255',
-                'avatar' => 'nullable|string',
-                'job' => 'nullable|string',
-                'description' => 'nullable|string',
-            ]);
-
-            if ($validateUser->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'validation error',
-                    'errors' => $validateUser->errors()
-                ], 422);
-            }
-
-            // Get the authenticated user
-            $user = $request->user();
-
-            // Update the user
-            $user->update([
-                'name' => $request->username,
-                'avatar' => $request->avatar,
-                'job' => $request->job,
-                'description' => $request->description,
-            ]);
-
-            // Return the updated user information
-            return response()->json([
-                'code' => 200,
-                'msg' => 'User Updated Successfully',
                 'data' => $user
             ], 200);
         } catch (\Throwable $th) {

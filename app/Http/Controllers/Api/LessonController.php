@@ -149,7 +149,7 @@ class LessonController extends Controller
         $id = $request->id;
 
         try {
-            // Fetch the lesson by ID
+
             $result = Lesson::where('id', '=', $id)->select(
                 'name',
                 'description',
@@ -167,14 +167,14 @@ class LessonController extends Controller
 
             $videoData = $result->video;
 
-            // Add real quiz data for each video
+
             foreach ($videoData as &$video) {
-                // Check if a quiz file exists
+
                 if (!empty($video['quiz'])) {
-                    // Extract real data from the quiz file
+
                     $video['quiz_json'] = $this->extractQuizData($video['quiz']);
                 } else {
-                    $video['quiz_json'] = null; // If no quiz file, set as null
+                    $video['quiz_json'] = null;
                 }
             }
 
@@ -183,7 +183,7 @@ class LessonController extends Controller
                 [
                     'code' => 200,
                     'msg' => 'My all lesson detail is here',
-                    'data' => $videoData, // Return video data with real quiz_json
+                    'data' => $videoData,
                 ],
                 200
             );

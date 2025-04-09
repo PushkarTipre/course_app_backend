@@ -3,6 +3,7 @@
 use App\Http\Controllers\Web\HomeController;
 use App\Http\Controllers\ImageController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AnalyticsController;
 
 /*
 |--------------------------------------------------------------------------

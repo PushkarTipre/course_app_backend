@@ -1,0 +1,1 @@
+{"feature_count": 8, "classes": ["average", "fast", "slow"], "model_parameters": {"max_depth": 3, "learning_rate": 0.1, "n_estimators": 200}}

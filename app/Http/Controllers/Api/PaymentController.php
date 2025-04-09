@@ -17,6 +17,7 @@ use App\Models\Order;
 use Razorpay\Api\Api;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
@@ -95,20 +96,12 @@ class PaymentController extends Controller
                 'currency' => $razorpayOrder->currency,
                 'razorpay_key' => env('RAZORPAY_KEY'),
                 'course_name' => $searchCourse->name,
-                // 'course_description' => $searchCourse->description,
+
                 'success_url' => $success_url,
                 'cancel_url' => $cancel_url
             ];
 
-            // $checkoutUrl = url('/checkout_razorpay.html') . '?orderData=' . urlencode(json_encode($orderData));
 
-            // return response()->json([
-            //     'code' => 200,
-            //     'status' => true,
-            //     'data' => [
-            //         'checkout_url' => $checkoutUrl
-            //     ]
-            // ]);
             return response()->json([
                 'code' => 200,
                 'status' => true,
@@ -124,44 +117,6 @@ class PaymentController extends Controller
         }
     }
 
-    // public function webGoHooks()
-    // {
-    //     Log::info('Start here');
-    //     $razorpay = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
-    //     $endPointSecret = 'Pushkaraj2410?!';
-    //     $payload = @file_get_contents('php://input');
-    //     $sigHeader = $_SERVER['HTTP_X_RAZORPAY_SIGNATURE'];
-    //     $event = null;
-    //     Log::info('Set up buffer and handshake done!');
-    //     try {
-    //         // $event =    \Stripe\Webhook::constructEvent($payload, $sigHeader, $endPointSecret);
-    //         $razorpay->utility->verifyWebhookSignature($payload, $sigHeader, $endPointSecret);
-    //         $event = json_decode($payload, true);
-    //     } catch (\UnexpectedValueException $e) {
-    //         Log::info('UnexpectedValueException ' . $e);
-    //         http_response_code(400);
-    //         exit();
-    //     } catch (\Stripe\Exception\SignatureVerificationException $e) {
-    //         Log::info('SignatureVerificationException ' . $e);
-    //         http_response_code(400);
-    //         exit();
-    //     }
-    //     if ($event->type == 'charge.succeeded') {
-    //         $order = $event->data->object;
-    //         $metadata = $session['metadata'];
-    //         $orderNum = $metadata->order_num;
-    //         $userToken = $metadata->user_token;
-    //         Log::info('Order Number ' . $orderNum);
-    //         $map = [];
-    //         $map['status'] = 1;
-    //         $map['updated_at'] = Carbon::now();
-    //         $whereMap = [];
-    //         $whereMap['user_token'] = $userToken;
-    //         $whereMap['id'] = $orderNum;
-    //         Order::where($whereMap)->update($map);
-    //     }
-    //     http_response_code(200);
-    // }
 
     public function webGoHooks()
     {
@@ -200,8 +155,44 @@ class PaymentController extends Controller
             $whereMap['user_token'] = $userToken;
             $whereMap['id'] = $orderNum;
             Order::where($whereMap)->update($map);
+
+            $courseId = $metadata['course_id'];
+            $course = Course::find($courseId);
+            if ($course) {
+                $course->increment('purchase_count');
+            }
         }
 
         http_response_code(200);
+    }
+
+    public function getLatestCourses(Request $request)
+    {
+        try {
+            $userToken = $request->user_token;
+
+            // Retrieve the latest 3 courses with their details
+            $latestCourses = DB::table('orders')
+                ->join('courses', 'orders.course_id', '=', 'courses.id') // Join with courses table
+                ->where('orders.user_token', $userToken)
+                ->where('orders.status', 1)
+                ->orderBy('orders.created_at', 'desc')
+                ->limit(3)
+                ->select('orders.*', 'courses.name as course_name', 'courses.description', 'courses.thumbnail') // Select desired columns
+                ->get();
+
+            return response()->json([
+                'code' => 200,
+                'status' => true,
+                'data' => $latestCourses
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'code' => 500,
+                'status' => false,
+                'msg' => 'An error occurred',
+                'data' => $th->getMessage()
+            ], 500);
+        }
     }
 }
